@@ -1,0 +1,1 @@
+var createDist = require( './../lib' );
