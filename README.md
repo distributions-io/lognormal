@@ -58,17 +58,17 @@ The default `scale` is 1.
 Returns the distribution support, which is all positive real numbers.
 
 ``` javascript
-dist.support();
+var support = dist.support();
 // returns [5e-324, +inf]
 ```
 
 
-#### dist.mean( [value] )
+#### dist.mean()
 
 Returns the distribution `mean`.
 
 ``` javascript
-dist.mean();
+var mean = dist.mean();
 ```
 
 
@@ -77,7 +77,7 @@ dist.mean();
 Returns the distribution `variance`.
 
 ``` javascript
-dist.variance();
+var variance = dist.variance();
 ```
 
 
