@@ -34,13 +34,96 @@ describe( 'distributions-lognormal', function tests() {
 		expect( createDist ).to.be.a( 'function' );
 	});
 
+	describe( 'location', function test() {
+
+		it( 'should provide a setter/getter for the location parameter', function test() {
+			expect( dist.location ).to.be.a( 'function' );
+		});
+
+		it( 'should throw an error if provided a non-numeric location', function test() {
+			var values = [
+					'5',
+					true,
+					undefined,
+					null,
+					NaN,
+					[],
+					{},
+					function(){}
+				];
+
+			for ( var i = 0; i < values.length; i++ ) {
+				expect( badValue( values[i] ) ).to.throw( TypeError );
+			}
+
+			function badValue( value ) {
+				return function() {
+					dist.location( value );
+				};
+			}
+		});
+
+		it( 'should set the distribution location parameter', function test() {
+			dist.location( 100 );
+			assert.strictEqual( dist.location(), 100 );
+		});
+
+	}); // end TESTS location
+
+	describe( 'scale', function test() {
+
+		it( 'should provide a setter/getter for the scale parameter', function test() {
+			expect( dist.scale ).to.be.a( 'function' );
+		});
+
+		it( 'should throw an error if provided a non-numeric scale', function test() {
+			var values = [
+					'5',
+					true,
+					undefined,
+					null,
+					NaN,
+					[],
+					{},
+					function(){}
+				];
+
+			for ( var i = 0; i < values.length; i++ ) {
+				expect( badValue( values[i] ) ).to.throw( TypeError );
+			}
+
+			function badValue( value ) {
+				return function() {
+					dist.scale( value );
+				};
+			}
+		});
+
+		it( 'should throw an error if provided a non-positive scale', function test() {
+			expect( badValue( -1 ) ).to.throw( Error );
+			function badValue( value ) {
+				return function() {
+					dist.scale( value );
+				};
+			}
+		});
+
+		it( 'should set the distribution scale parameter', function test() {
+			dist.scale( 100 );
+			assert.strictEqual( dist.scale(), 100 );
+		});
+
+	}); // end TESTS scale
+
 	describe( 'support', function tests() {
 
 		it( 'should provide a method to get the distribution support', function test() {
 			expect( dist.support ).to.be.a( 'function' );
 		});
 
-		it( 'should return the support' );
+		it( 'should return the support', function test() {
+			assert.deepEqual( dist.support(), [5e-324, Number.POSITIVE_INFINITY ] );
+		});
 
 	}); // end TESTS support
 
@@ -48,6 +131,13 @@ describe( 'distributions-lognormal', function tests() {
 
 		it( 'should provide a method for the distribution mean', function test() {
 			expect( dist.mean ).to.be.a( 'function' );
+		});
+
+		it( 'should return the mean', function test() {
+			dist.location( 1 )
+				.scale( 1 );
+			expect( dist.mean() ).to.be.a( 'number' );
+			assert.strictEqual( dist.mean(), Math.E );
 		});
 
 	}); // end TESTS mean
@@ -58,6 +148,16 @@ describe( 'distributions-lognormal', function tests() {
 			expect( dist.variance ).to.be.a( 'function' );
 		});
 
+		it( 'should return the variance', function test(){
+			dist.location( 0 )
+				.scale( 1 );
+
+			var s2 = dist.variance(),
+				expected = Math.E*Math.E - Math.E;
+
+			assert.closeTo( s2, expected, 1e-7 );
+		});
+
 	}); // end TESTS variance
 
 	describe( 'median', function tests() {
@@ -66,7 +166,10 @@ describe( 'distributions-lognormal', function tests() {
 			expect( dist.median ).to.be.a( 'function' );
 		});
 
-		it( 'should return the median value' );
+		it( 'should return the median value', function test() {
+			dist.location( 0 );
+			assert.strictEqual( dist.median(), 1 );
+		});
 
 	}); // end TESTS median
 
@@ -76,7 +179,11 @@ describe( 'distributions-lognormal', function tests() {
 			expect( dist.mode ).to.be.a( 'function' );
 		});
 
-		it( 'should return the mode' );
+		it( 'should return the mode', function test() {
+			dist.location( 1 )
+				.scale( 1 );
+			assert.strictEqual( dist.mode(), 1 );
+		});
 
 	}); // end TESTS mode
 
@@ -86,7 +193,11 @@ describe( 'distributions-lognormal', function tests() {
 			expect( dist.skewness ).to.be.a( 'function' );
 		});
 
-		it( 'should return the skewness' );
+		it( 'should return the skewness', function test() {
+			dist.scale( 1 );
+			var skew = ( Math.E + 2 ) * Math.sqrt( Math.E - 1 );
+			assert.closeTo( dist.skewness(), skew, 1e-7 );
+		});
 
 	}); // end TESTS skewness
 
@@ -96,7 +207,11 @@ describe( 'distributions-lognormal', function tests() {
 			expect( dist.ekurtosis ).to.be.a( 'function' );
 		});
 
-		it( 'should return the excess kurtosis' );
+		it( 'should return the excess kurtosis', function test() {
+			dist.scale( 1 );
+			var ek = Math.exp( 4 ) + 2*Math.exp( 3 ) + 3*Math.exp( 2 ) - 6;
+			assert.closeTo( dist.ekurtosis(), ek, 1e-7 );
+		});
 
 	}); // end TESTS kurtosis
 
@@ -106,7 +221,14 @@ describe( 'distributions-lognormal', function tests() {
 			expect( dist.entropy ).to.be.a( 'function' );
 		});
 
-		it( 'should return the distribution entropy' );
+		it( 'should return the distribution entropy', function test() {
+			dist.location( 0 )
+				.scale( 1 );
+
+			var entropy = 0.5 + 0.5*Math.log( 2*Math.PI );
+
+			assert.closeTo( dist.entropy(), entropy, 1e-7 );
+		});
 
 	}); // end TESTS entropy
 
@@ -116,7 +238,10 @@ describe( 'distributions-lognormal', function tests() {
 			expect( dist.information ).to.be.a( 'function' );
 		});
 
-		it( 'should return the distribution information' );
+		it( 'should return the distribution information', function test() {
+			dist.scale( 1 );
+			assert.deepEqual( dist.information(), [[1, 0], [0, 2]] );
+		});
 
 	}); // end TESTS information
 
@@ -176,7 +301,10 @@ describe( 'distributions-lognormal', function tests() {
 			}
 		});
 
-		it( 'should evaluate the pdf' );
+		it( 'should evaluate the pdf', function test() {
+			var data = [ 0, 5e-324, 0.5, 1, 1.5, 2, 10 ];
+			expect( dist.pdf( data ) ).to.be.an( 'array' );
+		});
 
 	}); // end TESTS pdf
 
@@ -236,80 +364,10 @@ describe( 'distributions-lognormal', function tests() {
 			}
 		});
 
-		it( 'should evaluate the cdf' );
-
+		it( 'should evaluate the cdf', function test() {
+			var data = [ 5e-324, 0.5, 1, 1.5, 2, 10 ];
+			expect( dist.cdf( data ) ).to.be.an( 'array' );
+		});
 	}); // end TESTS cdf
-
-	describe( 'quantile', function test() {
-
-		it( 'should provide a method to get/evaluate the inverse cumulative distribution (quantile) function', function test() {
-			expect( dist.inv ).to.be.a( 'function' );
-		});
-
-		it( 'should return a function', function test() {
-			expect( dist.inv() ).to.be.a( 'function' );
-		});
-
-		it( 'should throw an error if not provided an array', function test() {
-			var values = [
-					5,
-					'5',
-					true,
-					undefined,
-					null,
-					NaN,
-					{},
-					function(){}
-				];
-
-			for ( var i = 0; i < values.length; i++ ) {
-				expect( badValue( values[i] ) ).to.throw( TypeError );
-			}
-
-			function badValue( value ) {
-				return function() {
-					dist.inv( value );
-				};
-			}
-		});
-
-		it( 'should throw an error if array contains non-numeric values', function test() {
-			var values = [
-					[],
-					'5',
-					true,
-					undefined,
-					null,
-					NaN,
-					{},
-					function(){}
-				];
-
-			for ( var i = 0; i < values.length; i++ ) {
-				expect( badValue( values[i] ) ).to.throw( TypeError );
-			}
-
-			function badValue( value ) {
-				return function() {
-					dist.inv( [value] );
-				};
-			}
-		});
-
-		it( 'should throw an error if array contains numeric values not on the interval [0,1]', function test() {
-			var values = [ -0.01, 1.01 ];
-			for ( var i = 0; i < values.length; i++ ) {
-				expect( badValue( values[i] ) ).to.throw( Error );
-			}
-			function badValue( value ) {
-				return function() {
-					dist.inv( [value] );
-				};
-			}
-		});
-
-		it( 'should evaluate the quantile function' );
-
-	}); // end TESTS quantile
 
 });

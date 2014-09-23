@@ -29,12 +29,15 @@
     "statistics",
     "stats",
     "pdf",
-    "cdf"
+    "cdf",
+    "lognormal"
   ],
   "bugs": {
     "url": "https://github.com/distributions-io/lognormal/issues"
   },
-  "dependencies": {},
+  "dependencies": {
+    "compute-erf": "^1.1.0"
+  },
   "devDependencies": {
     "chai": "1.x.x",
     "mocha": "1.x.x",

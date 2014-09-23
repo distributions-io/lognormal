@@ -22,7 +22,7 @@ To use the module,
 var createDist = require( 'distributions-lognormal' );
 ```
 
-To create a distribution,
+To create a lognormal distribution,
 
 ``` javascript
 var dist = createDist();
@@ -31,28 +31,50 @@ var dist = createDist();
 The distribution is configurable and has the following methods...
 
 
+#### dist.location( [value] )
+
+This method is a setter/getter. If no `value` is provided, returns the distribution `location` parameter. To set the distribution `location` parameter,
+
+``` javascript
+dist.location( 10 );
+```
+
+The default `location` is 0.
+
+
+#### dist.scale( [value] )
+
+This method is a setter/getter. If no `value` is provided, returns the distribution `scale` parameter. To set the distribution `scale` parameter,
+
+``` javascript
+dist.scale( 5 );
+```
+
+The default `scale` is 1.
+
+
 #### dist.support()
 
-Returns the distribution support.
+Returns the distribution support, which is all positive real numbers.
 
 ``` javascript
 dist.support();
-// returns 
+// returns [5e-324, +inf]
 ```
 
 
 #### dist.mean( [value] )
 
-This method is a setter/getter. If no `value` is provided, returns the distribution `mean`. To set the distribution `mean`,
+Returns the distribution `mean`.
 
 ``` javascript
-dist.mean( 100 );
+dist.mean();
 ```
 
 
-#### dist.variance( [value] )
+#### dist.variance()
 
-This method is a setter/getter. If no `value` is provided, returns the distribution `variance`. To set the distribution `variance`,
+Returns the distribution `variance`.
 
 ``` javascript
 dist.variance();
@@ -65,7 +87,6 @@ Returns the distribution `median`.
 
 ``` javascript
 var median = dist.median();
-// equals 
 ```
 
 
@@ -75,7 +96,6 @@ Returns the distribution `mode`.
 
 ``` javascript
 var mode = dist.mode();
-// equals 
 ```
 
 
@@ -85,7 +105,6 @@ Returns the distribution `skewness`.
 
 ``` javascript
 var skewness = dist.skewness();
-// returns 
 ```
 
 #### dist.ekurtosis()
@@ -94,7 +113,6 @@ Returns the distribution `excess kurtosis`.
 
 ``` javascript
 var excess = dist.ekurtosis();
-// returns 
 ```
 
 
@@ -114,44 +132,31 @@ Returns the distribution's [differential entropy](http://en.wikipedia.org/wiki/D
 
 ``` javascript
 var entropy = dist.entropy();
-// 
 ```
+
 
 #### dist.pdf( [arr] )
 
 If a vector is not provided, returns the probability density function (PDF). If a vector is provided, evaluates the PDF for each vector element.
 
 ``` javascript
-var data = [ -1, -0.5, 0, 0.5, 1 ];
+var data = [ 5e-324, 0.5, 1, 1.5, 2, 5, 10 ];
 
 var pdf = dist.pdf( data );
 // returns [...]
 ```
+
 
 #### dist.cdf( [arr] )
 
 If a vector is not provided, returns the cumulative density function (CDF). If a vector is provided, evaluates the CDF for each vector element.
 
 ``` javascript
-var data = [ -1, -0.5, 0, 0.5, 1 ];
+var data = [ 5e-324, 0.5, 1, 1.5, 2, 5, 10 ];
 
 var cdf = dist.cdf( data );
 // returns [...]
 ```
-
-
-#### dist.inv( [arr] )
-
-If a cumulative probability vector is not provided, returns the inverse cumulative distribution function (aka the quantile function). If a cumulative probability vector is provided, evaluates the quantile function for each vector element.
-
-``` javascript
-var probs = [ 0.025, 0.5, 0.975 ];
-
-var quantiles = dist.inv( probs );
-// returns [...]
-``` 
-
-Note: all vector values must exist on the interval `[0, 1]`.
 
 
 
@@ -159,6 +164,42 @@ Note: all vector values must exist on the interval `[0, 1]`.
 
 ``` javascript
 var createDist = require( 'distributions-lognormal' );
+
+// Define the distribution parameters...
+var loc = 0,
+	scale = 0.25,
+	xLow = 0,
+	xHigh = 200;
+
+// Create a vector...
+var vec = new Array( 1000 ),
+	len = vec.length,
+	inc;
+
+inc = ( xHigh - xLow ) / len;
+
+for ( var i = 0; i < len; i++ ) {
+	vec[ i ] = inc*i + xLow;
+}
+
+// Create a lognormal distribution and configure...
+var lognormal = createDist()
+	.location( loc )
+	.scale( scale );
+
+// Evaluate the probability density function over the vector...
+var pdf = lognormal.pdf( vec );
+
+// Find the max...
+var max = pdf[ 0 ],
+	idx = 0;
+for ( var j = 1; j < pdf.length; j++ ) {
+	if ( pdf[ j ] > max ) {
+		max = pdf[ j ];
+		idx = j;
+	}
+}
+console.log( 'Max: ' + vec[ idx ] );
 ```
 
 To run the example code from the top-level application directory,
